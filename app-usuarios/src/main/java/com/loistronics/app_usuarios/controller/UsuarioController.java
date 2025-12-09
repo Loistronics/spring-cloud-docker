@@ -2,12 +2,16 @@ package com.loistronics.app_usuarios.controller;
 
 import com.loistronics.app_usuarios.entity.Usuario;
 import com.loistronics.app_usuarios.services.UsuarioServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -32,14 +36,20 @@ public class UsuarioController {
     }
 
     @PostMapping("/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Usuario guardar(@RequestBody Usuario usuario){
-        return service.guardar(usuario);
+    public ResponseEntity<?> guardar(@Valid @RequestBody Usuario usuario, BindingResult result){
+        if(result.hasErrors()){
+            return validar(result);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> actualizar(@RequestBody Usuario usuario, @PathVariable Long id){
+    public ResponseEntity<?> actualizar(@Valid @RequestBody Usuario usuario,BindingResult result, @PathVariable Long id){
+        if(result.hasErrors()){
+            return validar(result);
+        }
+
         Optional<Usuario> o = service.porId(id);
         if(o.isPresent()){
             Usuario usu = o.get();
@@ -59,6 +69,14 @@ public class UsuarioController {
             service.eliminar(id);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
+        Map<String,String> errores = new HashMap<>();
+        result.getFieldErrors().forEach(err ->{
+            errores.put(err.getField(),"El campo: " + err.getField() + " " + err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errores);
     }
 
 
