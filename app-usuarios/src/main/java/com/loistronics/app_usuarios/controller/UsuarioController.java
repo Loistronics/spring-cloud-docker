@@ -9,13 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
-//@RequestMapping("/usuario")
 public class UsuarioController {
 
     @Autowired
@@ -40,6 +36,9 @@ public class UsuarioController {
         if(result.hasErrors()){
             return validar(result);
         }
+        if(!usuario.getEmail().isEmpty() && service.porEmail(usuario.getEmail()).isPresent()){
+            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje","Ya existe un usuario con ese correo"));
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
     }
 
@@ -49,10 +48,12 @@ public class UsuarioController {
         if(result.hasErrors()){
             return validar(result);
         }
-
         Optional<Usuario> o = service.porId(id);
         if(o.isPresent()){
             Usuario usu = o.get();
+            if(service.porEmail(usu.getEmail()).isPresent()){
+                return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje","Ya existe un usuario con ese correo"));
+            }
             usu.setNombre(usuario.getNombre());
             usu.setPassword(usuario.getPassword());
             usu.setEmail(usuario.getEmail());

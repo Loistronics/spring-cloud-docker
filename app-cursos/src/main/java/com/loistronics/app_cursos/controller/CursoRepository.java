@@ -20,7 +20,7 @@ public class CursoRepository {
     @Autowired
     private CursoServiceimpl service;
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<?> listar(){
         return ResponseEntity.ok(service.listar());
     }
@@ -34,7 +34,7 @@ public class CursoRepository {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> guardar(@Valid @RequestBody Curso curso, BindingResult result){
         if(result.hasErrors()){

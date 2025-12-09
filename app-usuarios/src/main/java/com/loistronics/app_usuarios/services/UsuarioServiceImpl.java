@@ -38,4 +38,9 @@ public class UsuarioServiceImpl implements IUsusarioService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    @Override
+    public Optional<Usuario> porEmail(String email) {
+        return repository.findByEmail(email);
+    }
 }
