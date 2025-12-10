@@ -9,13 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-public class CursoRepository {
+public class CursoController {
 
     @Autowired
     private CursoServiceimpl service;
@@ -59,7 +58,7 @@ public class CursoRepository {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("{/id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> eliminar(@PathVariable Long id){
         Optional<Curso> o = service.porId(id);
         if(o.isPresent()){
